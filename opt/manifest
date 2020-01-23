@@ -1,0 +1,6 @@
+http://github.com/prometheus/prometheus/releases/download/v2.9.2/prometheus-2.9.2.linux-amd64.tar.gz
+	checksum=sha-256=19d29910fd0e51765d47b59b9276df016441ad4c6c48e3b27e5aa9acb5d1da26
+	out=prometheus.tgz
+http://dl.grafana.com/oss/release/grafana_6.5.1_amd64.deb
+	checksum=sha-256=ea1d6ec1d55398e908726931b2e6c13ae94f55a331c3dbe6f6e1b0b95e78e161
+	out=grafana.deb

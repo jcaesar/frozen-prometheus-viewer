@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+trap 'echo "ERROR: $BASH_SOURCE:$LINENO $BASH_COMMAND" >&2' ERR
+#set -x
+
+begin=$(date +%s)
+
+data=(/mnt/*)
+if test ${#data[@]} -ne 1; then
+	echo "I need exactly a single archive file under /mnt"
+	ls -lAh /mnt
+	exit -1
+fi
+
+tar xvf ${data[0]} --strip=2 --directory /var/lib/prometheus --wildcards "*/prometheus/*"
+chown -R prometheus:prometheus /var/lib/prometheus
+
+mt=$(
+	find /var/lib/prometheus -exec stat -c%Y {} \; \
+	| while read t; do
+		if test $t -lt $begin; then
+			echo $t
+		fi
+	done | sort -n
+)
+dbeg=$(date -Iseconds -d@$(($(head -n1 <<<"$mt") - 1800)))
+dend=$(date -Iseconds -d@$(($(tail -n1 <<<"$mt") + 60)))
+
+shopt -s nullglob
+for f in /dash/*.json; do
+	jq '. + {"refresh": false, "time":{"from":"'$dbeg'", "to":"'$dend'"}}' "$f" | sponge "$f"
+done
+
+exec supervisord
