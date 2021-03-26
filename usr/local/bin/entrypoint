@@ -12,8 +12,16 @@ if test ${#data[@]} -ne 1; then
 	exit -1
 fi
 
-tar xvf ${data[0]} --strip=2 --directory /var/lib/prometheus --wildcards "*/prometheus/*"
+PROMETHEUS_FOLDER_WILDCARD=${PROMETHEUS_FOLDER_WILDCARD-"*/prometheus/*"}
+
+tar xvf ${data[0]} --strip=2 --directory /var/lib/prometheus --wildcards "$PROMETHEUS_FOLDER_WILDCARD"
 chown -R prometheus:prometheus /var/lib/prometheus
+
+if ! test -f /var/lib/prometheus/lock; then
+	echo Prometheus unpacked, prometheus lockfile not present
+	ls -lAh /var/lib/prometheus
+	exit -1
+fi
 
 mt=$(
 	find /var/lib/prometheus -exec stat -c%Y {} \; \

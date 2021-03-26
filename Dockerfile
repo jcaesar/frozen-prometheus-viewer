@@ -1,4 +1,4 @@
-FROM ubuntu:eoan as dl
+FROM ubuntu:latest as dl
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get -y install \
@@ -11,7 +11,7 @@ RUN aria2c --allow-overwrite true --always-resume false --show-console-readout=f
 RUN mkdir /opt/prometheus && tar xvf /opt/prometheus.tgz --strip=1 --directory=/opt/prometheus
 RUN rm -rf /opt/*.tgz
 
-FROM ubuntu:eoan
+FROM ubuntu:latest
 ENV DEBIAN_FRONTEND noninteractive
 
 COPY --from=dl /opt /opt
